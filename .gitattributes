@@ -1,1 +1,1 @@
-*.fcstd -text diff filter=plainzip
+*.fcstd -text diff=plainzip filter=plainzip
