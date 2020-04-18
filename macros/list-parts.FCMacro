@@ -1,0 +1,188 @@
+# -*- coding: utf-8 -*-
+
+__Name__ = 'list-parts'
+__Comment__ = 'Formats all parts referenced in an assembly as spreadsheet'
+__Author__ = 'episource'
+__Version__ = '0.1'
+__Date__ = '2020-04-13'
+__License__ = 'Apache-2.0'
+__Web__ = ''
+__Wiki__ = ''
+__Icon__ = ''
+__Help__ = 'Just run this macro. A spreadsheet "parts" will be (re)created.'
+__Status__ = 'Beta'
+__Requires__ = 'FreeCAD >= 0.19'
+__Communication__ = ''
+
+PARTS_ALL_SHEET_NAME = "parts"
+PARTS_SUBASSY_SHEET_NAME = "parts_subassemblies"
+ROOT_MODEL_NAME = "Model"
+DEFAULT_MODEL_TYPE = "Assembly4 Model"
+
+
+fastenersFound = False
+
+import itertools
+import FreeCAD as App
+from FreeCAD import Units
+try:
+    import FastenersCmd
+    fastenersFound = True
+except ImportError:
+    pass
+
+
+def printError(msg):
+    print(__Name__ + ": " + msg, file=sys.stderr)
+
+def tryGet(obj, attr, default=''):
+    result = None
+    if hasattr(obj, attr):
+        result = str(getattr(obj, attr))
+    elif hasattr(obj, attr.lower()):
+        result = str(getattr(obj, attr.lower()))
+    
+    if not result:
+        result = default
+    return result
+
+def isAssembly4Model(partObject):
+    return partObject is not None \
+        and hasattr(partObject, "TypeId") and partObject.TypeId == "App::Part" \
+        and hasattr(partObject, "Name") and partObject.Name == "Model"
+
+def getId(partDesc):
+    return partDesc['partType'] + "_" + partDesc['userLabel']
+
+def getTypeOfAssy(assy):
+    if assy.Type == DEFAULT_MODEL_TYPE:
+        return assy.Label
+    return assy.Type
+
+def addPart(parts, part, fullAssyName):
+    if 'Assembly4 Model' in part.Type and part.Document == App.ActiveDocument:
+        # suppress root model
+        return
+    partDesc = {
+        "doc": part.Document.Label,
+        "assy": fullAssyName,
+        "uniqueLabel": tryGet(part, 'Label'),
+        "partType": tryGet(part, 'Type', default=part.Label),
+        "userLabel": tryGet(part, 'Label2'),
+        "desc": tryGet(part, 'Desc', tryGet(part, 'Description'))
+    }
+    
+    if isAssembly4Model(part):
+        partDesc['partType'] = getTypeOfAssy(part)
+    
+    parts.append(partDesc)
+
+def addFeatureIfPartLike(parts, feature, fullAssyName):
+    partDesc = {
+        "doc": feature.Document.Label,
+        "assy": fullAssyName,
+        "uniqueLabel": tryGet(feature, 'Label'),
+        "partType": tryGet(feature, 'Type', feature.Label),
+        "userLabel": tryGet(feature, 'Label2'),
+        "desc": tryGet(feature, 'Desc', tryGet(feature, 'Description'))
+    }
+    if fastenersFound:
+        if hasattr(feature, 'Proxy') and issubclass(type(feature.Proxy), FastenersCmd.FSScrewObject):
+            partDesc["partType"] = "Screw/Bolt " + feature.type + " (" + feature.diameter + "x" + feature.length + ")"
+            parts.append(partDesc)
+
+def scanForParts(objects, qualifiedAssy, expandSubAssy=True, parts=[]):
+    if not isinstance(qualifiedAssy, str):
+        qualifiedAssy = getTypeOfAssy(qualifiedAssy)
+
+    for obj in objects:
+        if hasattr(obj, 'TypeId'):
+            if "App::Part" in obj.TypeId:
+                addPart(parts, obj, qualifiedAssy)
+            elif "Part::Feature" in obj.TypeId:
+                addFeatureIfPartLike(parts, obj, qualifiedAssy)
+            elif "App::Link" in obj.TypeId:
+                if isAssembly4Model(obj.LinkedObject):
+                    subAssy = qualifiedAssy + "/" + getTypeOfAssy(obj.LinkedObject)
+                    if expandSubAssy:
+                        scanForParts(obj.LinkedObject.Group, subAssy, parts)
+                    else:
+                        addPart(parts, obj.LinkedObject, subAssy)
+                else:
+                    addPart(parts, obj.LinkedObject, qualifiedAssy)
+                    scanForParts(obj.LinkedObject.Group, qualifiedAssy, expandSubAssy, parts)
+                
+    return parts
+
+def getOrCreateResultSheet(sheetName):
+    sheet = App.ActiveDocument.getObject(sheetName)
+    if sheet is None:
+        sheet = App.ActiveDocument.addObject("Spreadsheet::Sheet", sheetName)
+    elif 'Spreadsheet::Sheet' not in sheet.TypeId:
+        printError("an object named '" + sheetName + "' exists, but is not of type spreadsheet")
+        sheet = None
+    return sheet
+
+def setCell(sheet, col, row, value, style=None):
+    if value is None:
+        text = ''
+    elif isinstance(value, Units.Quantity):
+        text = value.UserString
+    else:
+        text = str(value)
+    
+    ref = col + str(row)
+    sheet.set(ref, "'" + text)
+
+    if style is not None:
+        sheet.setStyle(ref, style, 'add')
+
+def writeResults(sheet, parts):
+    preservedWidth = sheet.columnWidths.dumpContent()
+    sheet.clearAll()
+    sheet.columnWidths.restoreContent(preservedWidth)
+    
+    setCell(sheet, 'A', 1, 'Part List: ' + App.ActiveDocument.Label, 'bold|underline')
+    sheet.mergeCells('A1:D1')
+    setCell(sheet, 'A', 2, 'Quantity', 'bold')
+    setCell(sheet, 'B', 2, 'Type', 'bold')
+    setCell(sheet, 'C', 2, 'Label', 'bold')
+    setCell(sheet, 'D', 2, 'Assembly', 'bold')
+    setCell(sheet, 'E', 2, 'Document', 'bold')
+    setCell(sheet, 'F', 2, 'Description', 'bold')
+    
+    row = 2
+    for k,g in itertools.groupby(sorted(parts, key=getId), key=getId):
+        row += 1
+        gList = list(g)
+        quantity = len(gList)
+        desc = gList[0]
+        
+        setCell(sheet, 'A', row, quantity)
+        setCell(sheet, 'B', row, desc['partType'])
+        setCell(sheet, 'C', row, desc['userLabel'])
+        setCell(sheet, 'D', row, desc['assy'])
+        setCell(sheet, 'E', row, desc['doc'])
+        setCell(sheet, 'F', row, desc['desc'])
+    
+    sheet.recompute()
+
+if App.ActiveDocument is not None:
+    d = App.ActiveDocument
+    sheetAllParts = getOrCreateResultSheet(PARTS_ALL_SHEET_NAME)
+    sheetSubAssyParts = getOrCreateResultSheet(PARTS_SUBASSY_SHEET_NAME)
+
+    if not isAssembly4Model(d.getObject(ROOT_MODEL_NAME)):
+        printError("assembly4 model missing in active document: no object named '" + ROOT_MODEL_NAME + "' found or invalid type")
+    elif sheetAllParts is None or sheetSubAssyParts is None:
+        printError("failed to initialize result spreadsheets")
+    else:
+        model = d.getObject(ROOT_MODEL_NAME)
+        
+        #parts = scanForParts(model.Group, model, expandSubAssy=True)
+        #writeResults(sheetAllParts, parts)
+        
+        parts = scanForParts(model.Group, model, expandSubAssy=False)
+        writeResults(sheetSubAssyParts, parts)
+else:
+    printError("no active document")
