@@ -98,19 +98,18 @@ def scanForParts(objects, qualifiedAssy, expandSubAssy=True, parts=[]):
     for obj in objects:
         if hasattr(obj, 'TypeId'):
             if "App::Part" in obj.TypeId:
-                addPart(parts, obj, qualifiedAssy)
+                if isAssembly4Model(obj):
+                    subAssy = qualifiedAssy + "/" + getTypeOfAssy(obj)
+                    if expandSubAssy:
+                        scanForParts(obj.Group, subAssy, parts)
+                    else:
+                        addPart(parts, obj, subAssy)
+                else:
+                    addPart(parts, obj, qualifiedAssy)
             elif "Part::Feature" in obj.TypeId:
                 addFeatureIfPartLike(parts, obj, qualifiedAssy)
             elif "App::Link" in obj.TypeId:
-                if isAssembly4Model(obj.LinkedObject):
-                    subAssy = qualifiedAssy + "/" + getTypeOfAssy(obj.LinkedObject)
-                    if expandSubAssy:
-                        scanForParts(obj.LinkedObject.Group, subAssy, parts)
-                    else:
-                        addPart(parts, obj.LinkedObject, subAssy)
-                else:
-                    addPart(parts, obj.LinkedObject, qualifiedAssy)
-                    scanForParts(obj.LinkedObject.Group, qualifiedAssy, expandSubAssy, parts)
+                scanForParts([obj.LinkedObject], qualifiedAssy, expandSubAssy, parts)
                 
     return parts
 
