@@ -178,8 +178,8 @@ if App.ActiveDocument is not None:
     else:
         model = d.getObject(ROOT_MODEL_NAME)
         
-        #parts = scanForParts(model.Group, model, expandSubAssy=True)
-        #writeResults(sheetAllParts, parts)
+        parts = scanForParts(model.Group, model, expandSubAssy=True)
+        writeResults(sheetAllParts, parts)
         
         parts = scanForParts(model.Group, model, expandSubAssy=False)
         writeResults(sheetSubAssyParts, parts)
