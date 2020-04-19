@@ -18,6 +18,7 @@ PARTS_ALL_SHEET_NAME = "parts"
 PARTS_SUBASSY_SHEET_NAME = "parts_subassemblies"
 ROOT_MODEL_NAME = "Model"
 DEFAULT_MODEL_TYPE = "Assembly4 Model"
+STRING_WITH_NUMERIC_SUFIX = re.compile("(?P<num>^[0-9]+)(?P<str>.*)")
 
 
 fastenersFound = False
@@ -51,8 +52,16 @@ def isAssembly4Model(partObject):
         and hasattr(partObject, "TypeId") and partObject.TypeId == "App::Part" \
         and hasattr(partObject, "Name") and partObject.Name == "Model"
 
+def expandNumericSufix(string):
+    m = STRING_WITH_NUMERIC_SUFIX.match(string)
+    if m is None:
+        return string
+    groups = m.groupdict()
+    groups['num'] = int(groups['num'])
+    return "{num:015d}{str}".format(**groups)
+
 def getId(partDesc):
-    return partDesc['partType'] + "_" + partDesc['userLabel'] + "_" + partDesc['doc']
+    return expandNumericSufix(partDesc['partType']) + "_" + expandNumericSufix(partDesc['userLabel']) + "_" + partDesc['doc']
 
 def getTypeOfAssy(assy):
     if assy.Type == DEFAULT_MODEL_TYPE:
