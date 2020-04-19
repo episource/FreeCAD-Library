@@ -97,7 +97,9 @@ def addFeatureIfPartLike(parts, feature, fullAssyName):
     }
     if fastenersFound:
         if hasattr(feature, 'Proxy') and issubclass(type(feature.Proxy), FastenersCmd.FSScrewObject):
-            partDesc["partType"] = "Screw/Bolt " + feature.type + " (" + feature.diameter + "x" + feature.length + ")"
+            partDesc["partType"] = "Screw/Bolt " + feature.type
+            sufix = "" if not partDesc["userLabel"] else " | " + partDesc["userLabel"]
+            partDesc["userLabel"] = feature.diameter + "x" + feature.length + sufix
             parts.append(partDesc)
 
 def scanForParts(objects, qualifiedAssy, expandSubAssy=True, parts=[]):
