@@ -52,7 +52,7 @@ def isAssembly4Model(partObject):
         and hasattr(partObject, "Name") and partObject.Name == "Model"
 
 def getId(partDesc):
-    return partDesc['partType'] + "_" + partDesc['userLabel']
+    return partDesc['partType'] + "_" + partDesc['userLabel'] + "_" + partDesc['doc']
 
 def getTypeOfAssy(assy):
     if assy.Type == DEFAULT_MODEL_TYPE:
