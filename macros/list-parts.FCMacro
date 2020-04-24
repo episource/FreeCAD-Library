@@ -14,16 +14,11 @@ __Status__ = 'Beta'
 __Requires__ = 'FreeCAD >= 0.19'
 __Communication__ = ''
 
-PARTS_ALL_SHEET_NAME = "parts"
-PARTS_SUBASSY_SHEET_NAME = "parts_subassemblies"
-ROOT_MODEL_NAME = "Model"
-DEFAULT_MODEL_TYPE = "Assembly4 Model"
-STRING_WITH_NUMERIC_SUFIX = re.compile("(?P<num>^[0-9]+)(?P<str>.*)")
-
 
 fastenersFound = False
 
 import itertools
+import re
 import FreeCAD as App
 from FreeCAD import Units
 try:
@@ -31,6 +26,13 @@ try:
     fastenersFound = True
 except ImportError:
     pass
+
+
+PARTS_ALL_SHEET_NAME = "parts"
+PARTS_SUBASSY_SHEET_NAME = "parts_subassemblies"
+ROOT_MODEL_NAME = "Model"
+DEFAULT_MODEL_TYPE = "Assembly4 Model"
+STRING_WITH_NUMERIC_SUFIX = re.compile("(?P<num>^[0-9]+)(?P<str>.*)")
 
 
 def printError(msg):
