@@ -67,6 +67,8 @@ def getId(partDesc):
 
 def getTypeOfAssy(assy):
     if assy.Type == DEFAULT_MODEL_TYPE:
+        if assy.Label == ROOT_MODEL_NAME:
+            return assy.Document.Label
         return assy.Label
     return assy.Type
 
