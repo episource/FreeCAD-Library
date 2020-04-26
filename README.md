@@ -9,6 +9,17 @@ incompatibilities with older or newer FreeCAD builds might occur. The following
 software builds haven been used and are known to be compatible:
  - [FreeCAD v0.19.20514](https://www.freecadweb.org/downloads.php)
  - [Assembly4 Workbench v0.9.0](https://github.com/Zolko-123/FreeCAD_Assembly4)
+
+Before commiting to this repository, [_setup.sh](_setup.sh) should be run to
+setup a [git smudge filter](https://www.git-scm.com/docs/gitattributes#_filter),
+that decompresses `FCStd` files during commit: `FCStd` files are zip compressed
+archives of mostly `xml` formatted plaintext files. Git's delta compression
+works very well for xml files, but not if compressed. For security reasons, the
+filter needs to be configured explicitly. Therefore, it cannot be shared in a
+way that does need user interaction. Decompressing is done using compression
+level `store` which preserves full FreeCAD compatibility. A clean filter is not
+used, therefore files in working tree are slightly bigger after checkout
+compared with the initial file size.
  
 ## Macros
 ### list-parts
