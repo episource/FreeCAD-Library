@@ -40,12 +40,14 @@ Simple document frame to be used as template for the TechDraw workbench.
 Aluminium slot profile (30mm x 30mm, slot 8mm, B-Type) and related accessories.
 
 
-|  |  |  |
-|:---:|:---:|:---:|
-| [**AP3030S8** <br> ![AP3030S8](AP3030S8.png)](AP3030S8.FCStd) | [**AP3030S8_AngleConnector45** <br> ![AP3030S8_AngleConnector45](AP3030S8_AngleConnector45.png)](AP3030S8_AngleConnector45.FCStd) | [**AP3030S8_BracketSmall** <br> ![AP3030S8_BracketSmall](AP3030S8_BracketSmall.png)](AP3030S8_BracketSmall.FCStd) |
-| [**AP3030S8_BracketSmall_With_Single_StoneM6Heavy** <br> ![AP3030S8_BracketSmall_With_Single_StoneM6Heavy](AP3030S8_BracketSmall_With_Single_StoneM6Heavy.png)](AP3030S8_BracketSmall_With_Single_StoneM6Heavy.FCStd) | [**AP3030S8_BracketSmall_With_Two_StoneM6Heavy** <br> ![AP3030S8_BracketSmall_With_Two_StoneM6Heavy](AP3030S8_BracketSmall_With_Two_StoneM6Heavy.png)](AP3030S8_BracketSmall_With_Two_StoneM6Heavy.FCStd) | [**AP3030S8_Cap** <br> ![AP3030S8_Cap](AP3030S8_Cap.png)](AP3030S8_Cap.FCStd) |
-| [**AP3030S8_ConnectorSquare** <br> ![AP3030S8_ConnectorSquare](AP3030S8_ConnectorSquare.png)](AP3030S8_ConnectorSquare.FCStd) | [**AP3030S8_InnerBracket** <br> ![AP3030S8_InnerBracket](AP3030S8_InnerBracket.png)](AP3030S8_InnerBracket.FCStd) | [**AP3030S8_InnerBracketWithScrews** <br> ![AP3030S8_InnerBracketWithScrews](AP3030S8_InnerBracketWithScrews.png)](AP3030S8_InnerBracketWithScrews.FCStd) |
-| [**AP3030S8_StoneM6Heavy** <br> ![AP3030S8_StoneM6Heavy](AP3030S8_StoneM6Heavy.png)](AP3030S8_StoneM6Heavy.FCStd) | [**AP3030S8_StoneM8Heavy** <br> ![AP3030S8_StoneM8Heavy](AP3030S8_StoneM8Heavy.png)](AP3030S8_StoneM8Heavy.FCStd) | |
+|  |  |
+|:---:|:---:|
+| [**AP3030S8** <br> ![AP3030S8](AP3030S8.png)](AP3030S8.FCStd) | [**AP3030S8_AngleConnector45** <br> ![AP3030S8_AngleConnector45](AP3030S8_AngleConnector45.png)](AP3030S8_AngleConnector45.FCStd) |
+| [**AP3030S8_BracketSmall** <br> ![AP3030S8_BracketSmall](AP3030S8_BracketSmall.png)](AP3030S8_BracketSmall.FCStd) | [**AP3030S8_BracketSmall_With_Single_StoneM6Heavy** <br> ![AP3030S8_BracketSmall_With_Single_StoneM6Heavy](AP3030S8_BracketSmall_With_Single_StoneM6Heavy.png)](AP3030S8_BracketSmall_With_Single_StoneM6Heavy.FCStd) |
+| [**AP3030S8_BracketSmall_With_Two_StoneM6Heavy** <br> ![AP3030S8_BracketSmall_With_Two_StoneM6Heavy](AP3030S8_BracketSmall_With_Two_StoneM6Heavy.png)](AP3030S8_BracketSmall_With_Two_StoneM6Heavy.FCStd) | [**AP3030S8_Cap** <br> ![AP3030S8_Cap](AP3030S8_Cap.png)](AP3030S8_Cap.FCStd) |
+| [**AP3030S8_ConnectorSquare** <br> ![AP3030S8_ConnectorSquare](AP3030S8_ConnectorSquare.png)](AP3030S8_ConnectorSquare.FCStd) | [**AP3030S8_InnerBracket** <br> ![AP3030S8_InnerBracket](AP3030S8_InnerBracket.png)](AP3030S8_InnerBracket.FCStd) |
+| [**AP3030S8_InnerBracketWithScrews** <br> ![AP3030S8_InnerBracketWithScrews](AP3030S8_InnerBracketWithScrews.png)](AP3030S8_InnerBracketWithScrews.FCStd) | [**AP3030S8_StoneM6Heavy** <br> ![AP3030S8_StoneM6Heavy](AP3030S8_StoneM6Heavy.png)](AP3030S8_StoneM6Heavy.FCStd) |
+| [**AP3030S8_StoneM8Heavy** <br> ![AP3030S8_StoneM8Heavy](AP3030S8_StoneM8Heavy.png)](AP3030S8_StoneM8Heavy.FCStd) | |
 
 
 ### Misc
