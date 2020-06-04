@@ -182,7 +182,7 @@ def writeResults(sheet, parts):
         desc = gList[0]
         
         docs = ",\n".join(list(collections.Counter(x['doc'] for x in gList).keys()))
-        assemblies = ",\n".join(list(collections.Counter(x['assy'] for x in gList)]).keys()))
+        assemblies = ",\n".join(list(collections.Counter(x['assy'] for x in gList).keys()))
         
         setCell(sheet, 'A', row, quantity)
         setCell(sheet, 'B', row, desc['partType'])
