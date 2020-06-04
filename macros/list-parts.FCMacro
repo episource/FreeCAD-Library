@@ -3,7 +3,7 @@
 __Name__ = 'list-parts'
 __Comment__ = 'Formats all parts referenced in an assembly as spreadsheet'
 __Author__ = 'Philipp Serr (episource.de)'
-__Version__ = '0.3'
+__Version__ = '0.4'
 __Date__ = '2020-06-04'
 __License__ = 'CC-BY-4.0'
 __Web__ = 'https://github.com/episource/freecad-library'
@@ -181,8 +181,10 @@ def writeResults(sheet, parts):
         quantity = len(gList)
         desc = gList[0]
         
-        docs = ",\n".join(list(collections.Counter(x['doc'] for x in gList).keys()))
-        assemblies = ",\n".join(list(collections.Counter(x['assy'] for x in gList).keys()))
+        uniqueDocs = list(collections.Counter(x['doc'] for x in gList).keys())
+        docs = ",\n".join(uniqueDocs)
+        uniqueAssemblies = list(collections.Counter(x['assy'] for x in gList).keys())
+        assemblies = ",\n".join(uniqueAssemblies)
         
         setCell(sheet, 'A', row, quantity)
         setCell(sheet, 'B', row, desc['partType'])
@@ -190,6 +192,10 @@ def writeResults(sheet, parts):
         setCell(sheet, 'D', row, assemblies)
         setCell(sheet, 'E', row, docs)
         setCell(sheet, 'F', row, desc['desc'])
+        
+        heightFactor = max(len(uniqueDocs), len(uniqueAssemblies))
+        initialRowHeight = sheet.getRowHeight(str(row))
+        sheet.setRowHeight(str(row), heightFactor * initialRowHeight)
     
     sheet.recompute()
 
