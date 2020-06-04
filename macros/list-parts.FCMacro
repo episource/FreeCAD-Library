@@ -3,7 +3,7 @@
 __Name__ = 'list-parts'
 __Comment__ = 'Formats all parts referenced in an assembly as spreadsheet'
 __Author__ = 'Philipp Serr (episource.de)'
-__Version__ = '0.2'
+__Version__ = '0.3'
 __Date__ = '2020-06-04'
 __License__ = 'CC-BY-4.0'
 __Web__ = 'https://github.com/episource/freecad-library'
@@ -17,6 +17,7 @@ __Communication__ = ''
 
 fastenersFound = False
 
+import collections
 import itertools
 import re
 import FreeCAD as App
@@ -63,7 +64,10 @@ def expandNumericSufix(string):
     return "{num:015d}{str}".format(**groups)
 
 def getId(partDesc):
-    return expandNumericSufix(partDesc['partType']) + "_" + expandNumericSufix(partDesc['userLabel']) + "_" + partDesc['doc']
+    return getIdWithoutDoc(partDesc) + "_" + partDesc['doc']
+    
+def getIdWithoutDoc(partDesc):
+    return expandNumericSufix(partDesc['partType']) + "_" + expandNumericSufix(partDesc['userLabel'])
 
 def getTypeOfAssy(assy):
     if assy.Type == DEFAULT_MODEL_TYPE:
@@ -103,7 +107,8 @@ def addFeatureIfPartLike(parts, feature, fullAssyName):
         if hasattr(feature, 'Proxy') and issubclass(type(feature.Proxy), FastenersCmd.FSScrewObject):
             partDesc["partType"] = "Screw/Bolt " + feature.type
             sufix = "" if not partDesc["userLabel"] else " | " + partDesc["userLabel"]
-            partDesc["userLabel"] = feature.diameter + "x" + feature.length + sufix
+            length = feature.length if not feature.length == "Custom" else "{:g}".format(feature.lengthCustom.Value)
+            partDesc["userLabel"] = feature.diameter + "x" + length + sufix
             parts.append(partDesc)
 
 def scanForParts(objects, qualifiedAssy, expandSubAssy=True, parts=[]):
@@ -170,17 +175,20 @@ def writeResults(sheet, parts):
     setCell(sheet, 'F', 2, 'Description', 'bold')
     
     row = 2
-    for k,g in itertools.groupby(sorted(parts, key=getId), key=getId):
+    for k,g in itertools.groupby(sorted(parts, key=getId), key=getIdWithoutDoc):
         row += 1
         gList = list(g)
         quantity = len(gList)
         desc = gList[0]
         
+        docs = ",\n".join(list(collections.Counter(x['doc'] for x in gList).keys()))
+        assemblies = ",\n".join(list(collections.Counter(x['assy'] for x in gList)]).keys()))
+        
         setCell(sheet, 'A', row, quantity)
         setCell(sheet, 'B', row, desc['partType'])
         setCell(sheet, 'C', row, desc['userLabel'])
-        setCell(sheet, 'D', row, desc['assy'])
-        setCell(sheet, 'E', row, desc['doc'])
+        setCell(sheet, 'D', row, assemblies)
+        setCell(sheet, 'E', row, docs)
         setCell(sheet, 'F', row, desc['desc'])
     
     sheet.recompute()
