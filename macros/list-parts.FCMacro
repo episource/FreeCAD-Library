@@ -3,8 +3,8 @@
 __Name__ = 'list-parts'
 __Comment__ = 'Formats all parts referenced in an assembly as spreadsheet'
 __Author__ = 'Philipp Serr (episource.de)'
-__Version__ = '0.1'
-__Date__ = '2020-04-13'
+__Version__ = '0.2'
+__Date__ = '2020-06-04'
 __License__ = 'CC-BY-4.0'
 __Web__ = 'https://github.com/episource/freecad-library'
 __Wiki__ = ''
@@ -115,8 +115,12 @@ def scanForParts(objects, qualifiedAssy, expandSubAssy=True, parts=[]):
             if "App::Part" in obj.TypeId:
                 if isAssembly4Model(obj):
                     subAssy = qualifiedAssy + "/" + getTypeOfAssy(obj)
-                    if expandSubAssy:
-                        scanForParts(obj.Group, subAssy, parts)
+                    
+                    isAtomic = tryGet(obj, "IsAtomicPart", False)
+                    isTransient = tryGet(obj, "IsTransientPart", False)
+                        
+                    if (expandSubAssy or isTransient) and not isAtomic:
+                        scanForParts(obj.Group, subAssy, expandSubAssy=expandSubAssy, parts=parts)
                     else:
                         addPart(parts, obj, subAssy)
                 else:
@@ -124,7 +128,7 @@ def scanForParts(objects, qualifiedAssy, expandSubAssy=True, parts=[]):
             elif "Part::Feature" in obj.TypeId:
                 addFeatureIfPartLike(parts, obj, qualifiedAssy)
             elif "App::Link" in obj.TypeId:
-                scanForParts([obj.LinkedObject], qualifiedAssy, expandSubAssy, parts)
+                scanForParts([obj.LinkedObject], qualifiedAssy, expandSubAssy=expandSubAssy, parts=parts)
                 
     return parts
 
@@ -193,10 +197,10 @@ if App.ActiveDocument is not None:
     else:
         model = d.getObject(ROOT_MODEL_NAME)
         
-        parts = scanForParts(model.Group, model, expandSubAssy=True)
+        parts = scanForParts(model.Group, model, expandSubAssy=True, parts=[])
         writeResults(sheetAllParts, parts)
         
-        parts = scanForParts(model.Group, model, expandSubAssy=False)
+        parts = scanForParts(model.Group, model, expandSubAssy=False, parts=[])
         writeResults(sheetSubAssyParts, parts)
 else:
     printError("no active document")
